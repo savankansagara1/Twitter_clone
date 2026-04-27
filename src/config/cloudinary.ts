@@ -1,4 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Configure Cloudinary
 cloudinary.config({
@@ -7,13 +10,19 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Function to upload image to Cloudinary
-export const uploadImage = async (filePath: string): Promise<string> => {
-  // TODO: Implement upload logic
-  return '';
-};
 
-// Function to delete image from Cloudinary
-export const deleteImage = async (publicId: string): Promise<void> => {
-  // TODO: Implement delete logic
-};
+export { cloudinary };
+// // Function to upload image to Cloudinary
+// export const uploadImage = async (filePath: string): Promise<string> => {
+//   // TODO: Implement upload logic
+//    const result = await cloudinary.uploader.upload(filePath, {
+//     folder: 'TWITTER_CLONE', // optional: specify a folder in Cloudinary
+//   });
+
+//   return result.secure_url;
+// };
+
+// // Function to delete image from Cloudinary
+// export const deleteImage = async (publicId: string): Promise<void> => {
+//   // TODO: Implement delete logic
+// };

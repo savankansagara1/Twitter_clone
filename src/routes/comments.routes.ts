@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createComment, getComments, deleteComment } from '../controllers/comments.controller';
+import { verifyToken } from '../middleware/auth.jwt';
 
 const router = Router();
 

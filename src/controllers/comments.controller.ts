@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 // Function to create a comment
 export const createComment = async (req: Request, res: Response) => {
   // TODO: Implement comment creation
+  console.log("Creating comment with data:jwt use tjhay che ");
 };
 
 // Function to get comments

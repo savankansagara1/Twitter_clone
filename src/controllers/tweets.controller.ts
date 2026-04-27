@@ -4,7 +4,11 @@ import { Request, Response } from 'express';
 
 // Function to create a tweet
 export const createTweet = async (req: Request, res: Response) => {
-  // TODO: Implement tweet creation with media
+  // TODO: Implement tweet creation with media 
+  try{
+    
+  }
+
 };
 
 // Function to get tweets

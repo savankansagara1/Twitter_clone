@@ -7,7 +7,7 @@ const router = Router();
 router.get('/:id', getUserProfile);
 
 // Route to update user profile
-router.put('/:id', updateUserProfile);
+router.post('/:id', updateUserProfile);
 
 // Route to get followers
 router.get('/:id/followers', getFollowers);

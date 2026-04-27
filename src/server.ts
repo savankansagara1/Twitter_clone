@@ -1,6 +1,7 @@
 import express from "express";
 import type { Request, Response, Application } from "express";
 import db from "./config/db"
+import "./config"
 
 import { errorHandler } from './middleware/error.middleware';
 import { Router } from 'express';

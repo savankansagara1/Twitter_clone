@@ -34,7 +34,7 @@ async function signUp(req: Request, res: Response) {
         );
 
         res.status(201).json({
-            id: result.insertId,
+            id: result.insertId,    
             user: { username, email },
             message: "user created successfully",
         });
