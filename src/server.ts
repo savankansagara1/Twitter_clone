@@ -1,7 +1,19 @@
 import express from "express";
 import type { Request, Response, Application } from "express";
 import db from "./config/db"
+
+import { errorHandler } from './middleware/error.middleware';
+import { Router } from 'express';
+
 import authRoutes from "./routes/auth.routes"
+import usersRoutes from './routes/users.routes';
+import tweetsRoutes from './routes/tweets.routes';
+import mediaRoutes from './routes/media.routes';
+import followsRoutes from './routes/follows.routes';
+import reactionsRoutes from './routes/reactions.routes';
+import commentsRoutes from './routes/comments.routes';
+import notificationsRoutes from './routes/notifications.routes';
+
 
 import cors from "cors"
 
@@ -21,7 +33,14 @@ app.use(express.json());
 
 
 //routes
-app.use("/api/auth",authRoutes)
+app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/tweets', tweetsRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/follows', followsRoutes);
+app.use('/api/reactions', reactionsRoutes);
+app.use('/api/comments', commentsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 
 
