@@ -6,7 +6,7 @@ import { upload } from '../middleware/upload.middleware';
 const router = Router();
 
 // Route to create a tweet
-router.post('/', verifyToken, upload.single('file'),createTweet);
+router.post('/', verifyToken,upload.single('file'),createTweet);
 
 // Route to get tweets
 router.get('/', verifyToken, getTweets);
