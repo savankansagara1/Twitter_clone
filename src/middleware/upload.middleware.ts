@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import multer from 'multer';
+import { imagekit } from '../config';
 
  export const storage = multer.memoryStorage(); // Store files in memory for processing
 
@@ -7,3 +8,4 @@ import multer from 'multer';
 export const upload = multer({
   storage
 });
+

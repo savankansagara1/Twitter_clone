@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import db from "../config/db";
-import { User } from "../types";
+import { AuthenticateRequest, User } from "../types";
+import { ResultSetHeader } from "mysql2";
 
 // Controller for user-related operations
 
@@ -66,12 +67,40 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 // Function to get followers
-export const getFollowers = async (req: Request, res: Response) => {
+export const getFollowers = async (req: AuthenticateRequest, res: Response) => {
   // TODO: Implement followers retrieval
- 
+  const id = req.params.id
+  console.log(id) 
+
+  try{
+    const[result] = await db.query<ResultSetHeader>(`SELECT followee_id from follows where follower_id=?`,[id])
+    res.json({message:"followers has been fetched"})
+    console.log(result);
+    
+
+  }catch(error){
+    res
+      .status(500)
+      .json({ message: "Error getting user profile", error: error as any });
+  }
 };
 
 // Function to get following
 export const getFollowing = async (req: Request, res: Response) => {
   // TODO: Implement following retrieval
+  
+  const id = req.params.id
+  console.log(id) 
+
+  try{
+    const[result] = await db.query<ResultSetHeader>(`SELECT follower_id from follows where followee_id=?`,[id])
+    res.json({message:"followers has been fetched"})
+    console.log(result);
+    
+
+  }catch(error){
+    res
+      .status(500)
+      .json({ message: "Error getting user profile", error: error as any });
+  }
 };

@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { RowDataPacket } from "mysql2";
 
 export interface jwtPayload {
@@ -22,4 +23,8 @@ export interface User extends RowDataPacket {
     profile_image_url?: string;
     cover_image_url?: string;
     created_at: Date;
+}
+
+export interface AuthenticateRequest extends Request {
+  user?: User,
 }

@@ -17,6 +17,8 @@ interface AuthenticatedRequest extends Request {
 
 const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     let token = req.headers["authorization"];
+    console.log(token);
+    
     if (!token || typeof token !== "string") {
         return res.status(400).json({ message: "Token not found" });
     }
