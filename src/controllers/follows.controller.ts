@@ -8,7 +8,7 @@ import db from '../config/db';
 export const followUser = async (req: AuthenticateRequest, res: Response) => {
   // TODO: Implement follow logic 
   const user_id = req.user?.user_id;
-  const followee_id = req.params.id;
+  const followee_id = req.params.userId;
   console.log(user_id);
   console.log(followee_id);
 

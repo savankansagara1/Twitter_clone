@@ -5,9 +5,9 @@ import db from '../config/db';
 // Controller for retweet operations
 
 // Function to retweet
-export const retweet = async (req: AuthenticateRequest, res: Response) => {
+export const retweetTweet = async (req: AuthenticateRequest, res: Response) => {
   // TODO: Implement retweet logic
-  const tweetId = req.params.id;
+  const tweetId = req.params.tweetId;
   console.log(tweetId);
 
   const user_id = req.user?.user_id;
@@ -26,9 +26,9 @@ export const retweet = async (req: AuthenticateRequest, res: Response) => {
 };
 
 // Function to unretweet
-export const unretweet = async (req: AuthenticateRequest, res: Response) => {
+export const undoRetweet = async (req: AuthenticateRequest, res: Response) => {
   // TODO: Implement unretweet logic
-  const tweetId = req.params.id;
+  const tweetId = req.params.tweetId;
   console.log(tweetId);
 
   const user_id = req.user?.user_id;
