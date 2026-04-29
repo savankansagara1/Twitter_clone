@@ -207,6 +207,7 @@ LEFT JOIN tweet_media m ON t.tweet_id = m.tweet_id
 WHERE t.user_id IN (
   SELECT followee_id FROM follows WHERE follower_id = ?
 )
+OR t.user_id = ?  -- also include the logged-in user's own tweets
 
 UNION ALL
 
@@ -241,7 +242,7 @@ WHERE r.user_id IN (
 )
 
 ORDER BY created_at DESC`,
-      [userId, userId, userId, userId, userId, userId],
+      [userId, userId, userId, userId, userId, userId, userId],
     );
     console.log(rows);
     res.status(200).json({ rows });
