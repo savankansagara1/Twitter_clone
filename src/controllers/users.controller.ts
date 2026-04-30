@@ -302,7 +302,9 @@ export const getUserLikes = async (req: AuthenticateRequest, res: Response) => {
         EXISTS (
           SELECT 1 FROM retweets rt2 
           WHERE rt2.tweet_id = t.tweet_id AND rt2.user_id = ?
-        ) AS isRetweeted
+        ) AS isRetweeted,
+
+        'tweet' AS type
 
       FROM reactions r
       JOIN tweets t ON r.tweet_id = t.tweet_id

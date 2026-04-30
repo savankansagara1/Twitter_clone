@@ -48,7 +48,7 @@ const TweetDetailPage: React.FC = () => {
         <div className="sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border px-4 py-3 z-10 flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="text-textPrimary hover:bg-surface rounded-full p-2 transition-colors"
+            className="text-textPrimary hover:bg-surface rounded-full p-2 transition-colors ml-8 sm:ml-0"
           >
             ←
           </button>

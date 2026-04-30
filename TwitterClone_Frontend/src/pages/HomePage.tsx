@@ -42,7 +42,7 @@ const HomePage: React.FC = () => {
       <main className="flex-1 max-w-2xl border-x border-border">
         {/* Page header */}
         <div className="sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border px-4 py-3 z-10">
-          <h1 className="text-xl font-bold text-textPrimary">Home</h1>
+          <h1 className="text-xl font-bold text-textPrimary pl-8 sm:pl-0">Home</h1>
         </div>
 
         {/* Tweet compose box */}

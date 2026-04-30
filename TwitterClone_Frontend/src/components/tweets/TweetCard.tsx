@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Tweet } from "../../types";
 import { useAuth } from "../../hooks/useAuth";
@@ -23,6 +23,15 @@ const TweetCard: React.FC<TweetCardProps> = ({ tweet, onDelete }) => {
   const [likeCount, setLikeCount] = useState(Number(tweet.like_count) || 0);
   const [retweeted, setRetweeted] = useState(!!tweet.isRetweeted);
   const [retweetCount, setRetweetCount] = useState(Number(tweet.retweet_count) || 0);
+
+  // Sync local state when tweet prop changes (e.g. tab switch, page refresh, re-fetch)
+  // This ensures like/retweet state always reflects the actual backend state
+  useEffect(() => {
+    setLiked(!!tweet.isLiked);
+    setLikeCount(Number(tweet.like_count) || 0);
+    setRetweeted(!!tweet.isRetweeted);
+    setRetweetCount(Number(tweet.retweet_count) || 0);
+  }, [tweet.tweet_id, tweet.isLiked, tweet.isRetweeted, tweet.like_count, tweet.retweet_count]);
 
   // Toggle like with optimistic UI
  const handleLike = async (e: React.MouseEvent) => {
