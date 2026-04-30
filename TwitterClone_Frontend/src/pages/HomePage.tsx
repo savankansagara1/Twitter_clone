@@ -20,6 +20,7 @@ const HomePage: React.FC = () => {
     try {
       const res = await getFeed();
       // Backend returns: { rows: Tweet[] }
+      console.log("FEED:", res.data.rows);
       setTweets(res.data.rows || []);
     } catch {
       toast.error("Failed to load feed");

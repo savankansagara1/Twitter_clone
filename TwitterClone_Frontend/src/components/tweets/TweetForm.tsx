@@ -75,18 +75,27 @@ const TweetForm: React.FC<TweetFormProps> = ({ onTweetCreated }) => {
           className="w-full bg-transparent text-textPrimary placeholder-textSecondary text-lg resize-none outline-none"
         />
 
-        {/* Image preview */}
-        {preview && (
-          <div className="relative mt-2">
-            <img
-              src={preview}
-              alt="preview"
-              className="rounded-2xl max-h-48 object-cover"
-            />
-            <button
-              onClick={() => { setFile(null); setPreview(null); }}
-              className="absolute top-2 right-2 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-            >
+       {preview && (
+  <div className="relative mt-2">
+    {/* Check if the file is a video or image */}
+    {file?.type.startsWith("video/") ? (
+      <video
+        src={preview}
+        className="rounded-2xl max-h-48 w-full object-cover"
+        controls
+      />
+    ) : (
+      <img
+        src={preview}
+        alt="preview"
+        className="rounded-2xl max-h-48 object-cover"
+      />
+    )}
+    
+    <button
+      onClick={() => { setFile(null); setPreview(null); }}
+      className="absolute top-2 right-2 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+    >
               ✕
             </button>
           </div>

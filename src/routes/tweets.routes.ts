@@ -23,6 +23,6 @@ router.get("/feed", verifyToken, getFeedTweets);
 router.get("/:id",verifyToken, getTweetsByID);
 
 // Route to delete a tweet
-router.delete("/:id", verifyToken, deleteTweet);
+router.delete("/:tweet_id", verifyToken, deleteTweet);
 
 export default router;

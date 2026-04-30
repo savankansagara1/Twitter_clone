@@ -25,48 +25,64 @@ const TweetCard: React.FC<TweetCardProps> = ({ tweet, onDelete }) => {
   const [retweetCount, setRetweetCount] = useState(Number(tweet.retweet_count) || 0);
 
   // Toggle like with optimistic UI
-  const handleLike = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // prevent navigating to tweet detail
-    const prevLiked = liked;
-    // Optimistic update
-    setLiked(!liked);
-    setLikeCount((c) => (prevLiked ? c - 1 : c + 1));
+ const handleLike = async (e: React.MouseEvent) => {
+  e.stopPropagation();
 
-    try {
-      if (prevLiked) {
-        await unlikeTweet(tweet.tweet_id);
-      } else {
-        await likeTweet(tweet.tweet_id);
-      }
-    } catch {
-      // Revert on error
-      setLiked(prevLiked);
-      setLikeCount((c) => (prevLiked ? c + 1 : c - 1));
-      toast.error("Failed to update like");
+  const prevLiked = liked;
+
+  // optimistic update
+  setLiked(!prevLiked);
+  setLikeCount((c) =>
+    prevLiked ? Math.max(0, c - 1) : c + 1
+  );
+
+  try {
+    if (prevLiked) {
+      await unlikeTweet(tweet.tweet_id);
+    } else {
+      await likeTweet(tweet.tweet_id);
     }
-  };
+  } catch {
+    // rollback
+    setLiked(prevLiked);
+    setLikeCount((c) =>
+      prevLiked ? c + 1 : Math.max(0, c - 1)
+    );
+
+    toast.error("Failed to update like");
+  }
+};
 
   // Toggle retweet with optimistic UI
-  const handleRetweet = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const prevRetweeted = retweeted;
-    setRetweeted(!retweeted);
-    setRetweetCount((c) => (prevRetweeted ? c - 1 : c + 1));
+const handleRetweet = async (e: React.MouseEvent) => {
+  e.stopPropagation();
 
-    try {
-      if (prevRetweeted) {
-        await undoRetweet(tweet.tweet_id);
-        toast.success("Retweet removed");
-      } else {
-        await retweetTweet(tweet.tweet_id);
-        toast.success("Retweeted!");
-      }
-    } catch {
-      setRetweeted(prevRetweeted);
-      setRetweetCount((c) => (prevRetweeted ? c + 1 : c - 1));
-      toast.error("Failed to retweet");
+  const prevRetweeted = retweeted;
+
+  // optimistic update
+  setRetweeted(!prevRetweeted);
+  setRetweetCount((c) =>
+    prevRetweeted ? Math.max(0, c - 1) : c + 1
+  );
+
+  try {
+    if (prevRetweeted) {
+      await undoRetweet(tweet.tweet_id);
+      toast.success("Retweet removed");
+    } else {
+      await retweetTweet(tweet.tweet_id);
+      toast.success("Retweeted!");
     }
-  };
+  } catch {
+    // rollback
+    setRetweeted(prevRetweeted);
+    setRetweetCount((c) =>
+      prevRetweeted ? c + 1 : Math.max(0, c - 1)
+    );
+
+    toast.error("Failed to retweet");
+  }
+};
 
   // Delete tweet (only shown for own tweets)
   const handleDelete = async (e: React.MouseEvent) => {
@@ -132,15 +148,23 @@ const TweetCard: React.FC<TweetCardProps> = ({ tweet, onDelete }) => {
           {tweet.content}
         </p>
 
-        {/* Media (image/video) */}
-        {tweet.media_url && tweet.media_type?.startsWith("image") && (
-          <img
-            src={tweet.media_url}
-            alt="tweet media"
-            className="mt-2 rounded-2xl max-h-72 object-cover w-full"
-            onClick={(e) => e.stopPropagation()}
-          />
-        )}
+      {tweet.media_url ? (
+  tweet.media_type?.startsWith("image") ? (
+    <img
+      src={tweet.media_url}
+      alt="tweet media"
+      className="mt-2 rounded-2xl max-h-72 object-cover w-full"
+      onClick={(e) => e.stopPropagation()}
+    />
+  ) : (
+    <video
+      src={tweet.media_url}
+      className="mt-2 rounded-2xl max-h-72 w-full object-cover"
+      controls
+      onClick={(e) => e.stopPropagation()}
+    />
+  )
+) : null}
 
         {/* Action bar: like, retweet, comment count */}
         <div className="flex items-center gap-6 mt-3 text-textSecondary">

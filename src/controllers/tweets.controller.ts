@@ -12,41 +12,40 @@ import { uploadToImagekit } from "../utils/uploadToimagekit";
 export const createTweet = async (req: AuthenticateRequest, res: Response) => {
   try {
     const userId = req.user?.user_id;
-    console.log("Creating tweet for user ID:", userId);
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
+    const tweetContent = (req.body.content || "").trim();
+    if (!tweetContent) return res.status(400).json({ message: "Tweet Content required" });
 
-    const tweetContent = req.body.content?.trim() || "";
-    const files = req.file;
-    console.log(files);
-
-    const imageUrl = await uploadToImagekit(files!);
-    console.log(imageUrl);
-    if (!tweetContent) {
-      return res.status(400).json({ message: "Tweet Content required" });
-    }
+    const files = req.file; // multer single file => req.file, not req.fileS
+    // Insert tweet first (so we have tweetId even if there's no media)
     const [result] = await db.query<ResultSetHeader>(
-      `Insert into tweets(user_id,content) values (?,?)`,
+      `INSERT INTO tweets(user_id, content) VALUES (?, ?)`,
       [userId, tweetContent],
     );
-
     const tweetId = result.insertId;
-    //  console.log(tweetId);
-    res.status(201).json({ message: "Tweet created successfully", tweetId });
 
-    const [mediaResult] = await db.query<ResultSetHeader>(
-      `Insert into tweet_media(tweet_id,media_type, media_url) values (?,?,?)`,
-      [tweetId, files?.mimetype, imageUrl],
-    );
+    // If a file was uploaded, upload to ImageKit and save media row
+    if (files) {
+      try {
+        const imageUrl = await uploadToImagekit(files);
+        await db.query<ResultSetHeader>(
+          `INSERT INTO tweet_media(tweet_id, media_type, media_url) VALUES (?, ?, ?)`,
+          [tweetId, files.mimetype, imageUrl],
+        );
+      } catch (mediaErr) {
+        // optional: log media error but don't fail tweet creation
+        console.error("Media upload failed:", mediaErr);
+      }
+    }
+
+    res.status(201).json({ message: "Tweet created successfully", tweetId });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error as Error });
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error", message: (error as Error).message });
   }
 };
+
 
 // Function to get tweets by user
 export const getTweetsByUser = async (
@@ -156,12 +155,12 @@ export const getTweetsByUser = async (
 // Function to delete a tweet
 export const deleteTweet = async (req: AuthenticateRequest, res: Response) => {
   // TODO: Implement tweet deletion
-  const tweetId = req.params.id;
+  const tweetId = req.params.tweet_id;
   const userId = req.user?.user_id;
   console.log(tweetId);
   console.log(userId);
 
-  const [rows] = await db.query(`SELECT * FROM tweets WHERE tweet_id = ? AND user_id = ?`, [
+  const [rows] = await db.query(`Delete FROM tweets WHERE tweet_id = ? AND user_id = ?`, [
     tweetId,userId
   ]);
   console.log(rows);
