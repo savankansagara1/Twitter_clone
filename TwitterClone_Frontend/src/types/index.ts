@@ -22,6 +22,8 @@ export interface Tweet {
   username: string;
   fullname: string;
   profile_pic?: string;
+  cover_pic?: string;
+  user_id?:any,
   media_url?: string;
   media_type?: string;
   like_count?: number;

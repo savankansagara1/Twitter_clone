@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import db from "../config/db";
 import { AuthenticateRequest, User } from "../types";
 import { ResultSetHeader } from "mysql2";
+import { uploadToImagekit } from "../utils/uploadToimagekit";
 
 // Controller for user-related operations
 
@@ -30,9 +31,10 @@ export const getUserProfile = async (req: Request, res: Response) => {
 };
 
 // Function to update user profile
-export const updateUserProfile = async (req: Request, res: Response) => {
+export const updateUserProfile = async (req: any, res: Response) => {
   const userId = req.params.id;
-  const {
+
+  let {
     fullname,
     username,
     email,
@@ -44,8 +46,24 @@ export const updateUserProfile = async (req: Request, res: Response) => {
   } = req.body;
 
   try {
-    const [result] = await db.query<User[]>(
-      `UPDATE users SET fullname = ?, username = ?, email = ?, dob = ?, bio = ?, country = ?, profile_pic = ?, cover_pic = ? WHERE user_id = ?`,
+    const files = req.files;
+
+    // ✅ Upload profile pic if provided
+    if (files?.profile_pic?.[0]) {
+      const uploaded = await uploadToImagekit(files.profile_pic[0]);
+      profile_pic = uploaded;
+    }
+
+    // ✅ Upload cover pic if provided
+    if (files?.cover_pic?.[0]) {
+      const uploaded = await uploadToImagekit(files.cover_pic[0]);
+      cover_pic = uploaded;
+    }
+
+    await db.query(
+      `UPDATE users 
+       SET fullname = ?, username = ?, email = ?, dob = ?, bio = ?, country = ?, profile_pic = ?, cover_pic = ? 
+       WHERE user_id = ?`,
       [
         fullname,
         username,
@@ -56,13 +74,16 @@ export const updateUserProfile = async (req: Request, res: Response) => {
         profile_pic,
         cover_pic,
         Number(userId),
-      ],
+      ]
     );
+
     res.json({ message: "User profile updated successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating user profile", error: error as any });
+    console.error(error);
+    res.status(500).json({
+      message: "Error updating user profile",
+      error: error as any,
+    });
   }
 };
 
@@ -139,6 +160,8 @@ export const getUserTweets = async (req: AuthenticateRequest, res: Response) => 
         u.username,
         u.fullname,
         u.profile_pic,
+        u.cover_pic,
+        u.user_id,
         m.media_url,
         m.media_type,
 
@@ -171,6 +194,8 @@ export const getUserTweets = async (req: AuthenticateRequest, res: Response) => 
         u.username,
         u.fullname,
         u.profile_pic,
+        u.cover_pic,
+        u.user_id,
         m.media_url,
         m.media_type,
 
@@ -325,4 +350,20 @@ export const getUserLikes = async (req: AuthenticateRequest, res: Response) => {
       message: (err as Error).message
     });
   }
+};
+
+
+export const getUserByUsername = async (req: AuthenticateRequest, res: Response) => {
+  const { username } = req.params;
+
+  const user = await db.query(
+    "SELECT * FROM users WHERE username = ?",
+    [username]
+  );
+
+  if (!user.length) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.json(user[0]);
 };

@@ -49,13 +49,19 @@ const ProfilePage: React.FC = () => {
       if (fetchedTweets.length > 0) {
         // Build a partial user object from tweet data
         const firstTweet = fetchedTweets[0];
+        // console.log(firstTweet);
+        
+            const userId = fetchedTweets[0].user_id;
+            // console.log(userId);
+            
         setUser({
-          user_id: 0,
+          user_id: firstTweet.user_id,
           fullname: firstTweet.fullname,
           username: firstTweet.username,
           email: "",
           dob: "",
           profile_pic: firstTweet.profile_pic,
+          cover_pic :firstTweet.cover_pic,
           created_at: firstTweet.created_at,
         });
       }
@@ -119,7 +125,7 @@ const ProfilePage: React.FC = () => {
         <div className="sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border px-4 py-3 z-10 flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="text-textPrimary hover:bg-surface rounded-full p-2 transition-colors ml-8 sm:ml-0"
+            className="text-textPrimary hover:bg-surface rounded-full p-2 transition-colors"
           >
             ←
           </button>

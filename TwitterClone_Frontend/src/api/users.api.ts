@@ -3,6 +3,8 @@ import api from "./axios";
 // GET /api/users/:id  → returns User object
 export const getUserById = (id: number) => api.get(`/users/${id}`);
 
+export const getUserProfile = (id: number) => api.get(`/users/${id}`);
+
 // GET /api/users/:username/tweets  → returns { tweets: Tweet[] }
 export const getUserTweets = (username: string) =>
   api.get(`/users/${username}/tweets`);
@@ -25,5 +27,12 @@ export const getFollowing = (userId: number) =>
 
 // POST /api/users/:id  → update profile
 // Body: { fullname, username, email, dob, bio, country, profile_pic, cover_pic }
-export const updateProfile = (id: number, data: object) =>
-  api.post(`/users/${id}`, data);
+export const updateProfile = (id: number, data: any) =>
+  api.post(`/users/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+export const getUserByUsername = (username: string) =>
+  api.get(`/users/username/${username}`);

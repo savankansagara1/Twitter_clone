@@ -19,7 +19,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   const { authUser } = useAuth();
   const isOwnProfile = authUser?.user_id === user.user_id;
-
+  // console.log(user.cover_pic);
+  
   return (
     <div>
       {/* Cover photo */}

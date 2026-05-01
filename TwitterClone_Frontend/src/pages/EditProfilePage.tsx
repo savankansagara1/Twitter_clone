@@ -12,6 +12,8 @@ const EditProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
   // Form mirrors the updateUserProfile endpoint fields
   const [form, setForm] = useState({
@@ -31,6 +33,7 @@ const EditProfilePage: React.FC = () => {
     getUserById(authUser.user_id)
       .then((res) => {
         const u: User = res.data;
+        
         setForm({
           fullname: u.fullname || "",
           username: u.username || "",
@@ -47,10 +50,26 @@ const EditProfilePage: React.FC = () => {
   }, [authUser]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // const handleSave = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!authUser?.user_id) return;
+
+  //   setSaving(true);
+  //   try {
+  //     await updateProfile(authUser.user_id, form);
+  //     toast.success("Profile updated!");
+  //     navigate(`/profile/${form.username}`);
+  //   } catch (err: any) {
+  //     toast.error(err?.response?.data?.message || "Failed to update profile");
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +77,27 @@ const EditProfilePage: React.FC = () => {
 
     setSaving(true);
     try {
-      await updateProfile(authUser.user_id, form);
+      const formData = new FormData();
+
+      formData.append("fullname", form.fullname);
+      formData.append("username", form.username);
+      formData.append("email", form.email);
+      formData.append("dob", form.dob);
+      formData.append("bio", form.bio);
+      formData.append("country", form.country);
+      
+
+      // ✅ Only append files if selected
+      if (profileFile) {
+        formData.append("profile_pic", profileFile);
+      }
+
+      if (coverFile) {
+        formData.append("cover_pic", coverFile);
+      }
+
+      await updateProfile(authUser.user_id, formData);
+
       toast.success("Profile updated!");
       navigate(`/profile/${form.username}`);
     } catch (err: any) {
@@ -125,7 +164,9 @@ const EditProfilePage: React.FC = () => {
               placeholder="Your country"
             />
             <div className="flex flex-col gap-1">
-              <label className="text-textSecondary text-sm font-medium">Bio</label>
+              <label className="text-textSecondary text-sm font-medium">
+                Bio
+              </label>
               <textarea
                 name="bio"
                 value={form.bio}
@@ -135,21 +176,35 @@ const EditProfilePage: React.FC = () => {
                 className="bg-surface border border-border rounded-lg px-4 py-3 text-textPrimary placeholder-textSecondary outline-none focus:border-primary resize-none"
               />
             </div>
-            <FormField
-              label="Profile Picture URL"
-              name="profile_pic"
-              value={form.profile_pic}
-              onChange={handleChange}
-              placeholder="https://..."
-            />
-            <FormField
-              label="Cover Picture URL"
-              name="cover_pic"
-              value={form.cover_pic}
-              onChange={handleChange}
-              placeholder="https://..."
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-textSecondary text-sm font-medium">
+                Profile Picture
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    setProfileFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
 
+            <div className="flex flex-col gap-1">
+              <label className="text-textSecondary text-sm font-medium">
+                Cover Picture
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    setCoverFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
             <button
               type="submit"
               disabled={saving}
