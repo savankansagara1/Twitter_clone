@@ -101,7 +101,7 @@ JOIN users u ON f.follower_id = u.user_id
 WHERE f.followee_id = ?;`,
       [id],
     );
-    res.json({ message: "followers has been fetched" });
+    res.json({ message: "followers has been fetched" ,result});
     console.log(result);
   } catch (error) {
     res
@@ -125,7 +125,7 @@ JOIN users u ON f.followee_id = u.user_id
 WHERE f.follower_id = ?;`,
       [id],
     );
-    res.json({ message: "following has been fetched" });
+    res.json({ message: "following has been fetched" , result});
     console.log(result);
   } catch (error) {
     res
@@ -356,14 +356,15 @@ export const getUserLikes = async (req: AuthenticateRequest, res: Response) => {
 export const getUserByUsername = async (req: AuthenticateRequest, res: Response) => {
   const { username } = req.params;
 
-  const user = await db.query(
+  const [rows]: any = await db.query(
     "SELECT * FROM users WHERE username = ?",
     [username]
   );
 
-  if (!user.length) {
+  if (rows.length === 0) {
     return res.status(404).json({ message: "User not found" });
   }
 
-  res.json(user[0]);
+  // ✅ return single object
+  res.json({ user: rows[0] });
 };

@@ -44,3 +44,20 @@ export const unfollowUser = async (req: AuthenticateRequest, res: Response) => {
     res.status(500).json({ message: (err as Error).message });
   }   
 };
+
+
+
+export const isFollowing = async (req: AuthenticateRequest, res: Response) => {
+  const currentUserId = req.user?.user_id;
+  // console.log(currentUserId);
+  
+  const targetUserId = req.params.userId;
+// console.log(targetUserId);
+
+  const result = await db.query(
+    "SELECT 1 FROM follows WHERE follower_id = ? AND followee_id = ?",
+    [currentUserId, targetUserId]
+  );
+
+  res.json({ isFollowing: result.length > 0 });
+};

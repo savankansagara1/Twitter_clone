@@ -7,3 +7,4 @@ export const followUser = (userId: number) =>
 // DELETE /api/follows/:userId  → unfollow a user
 export const unfollowUser = (userId: number) =>
   api.delete(`/follows/${userId}`);
+

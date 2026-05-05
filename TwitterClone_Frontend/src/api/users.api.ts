@@ -3,7 +3,7 @@ import api from "./axios";
 // GET /api/users/:id  → returns User object
 export const getUserById = (id: number) => api.get(`/users/${id}`);
 
-export const getUserProfile = (id: number) => api.get(`/users/${id}`);
+export const getUserProfile = (id) => api.get(`/users/${id}`);
 
 // GET /api/users/:username/tweets  → returns { tweets: Tweet[] }
 export const getUserTweets = (username: string) =>
