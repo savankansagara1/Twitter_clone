@@ -355,10 +355,25 @@ export const getUserLikes = async (req: AuthenticateRequest, res: Response) => {
 
 export const getUserByUsername = async (req: AuthenticateRequest, res: Response) => {
   const { username } = req.params;
+  
+  let currentUserId = null;
+  let token = req.headers["authorization"];
+  if (token && typeof token === "string" && token.startsWith("Bearer ")) {
+    token = token.slice(7);
+    try {
+      const jwt = require("jsonwebtoken");
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as any;
+      currentUserId = decoded.id;
+    } catch (err) {}
+  }
 
   const [rows]: any = await db.query(
-    "SELECT * FROM users WHERE username = ?",
-    [username]
+    `SELECT u.*,
+      EXISTS(SELECT 1 FROM follows WHERE follower_id = ? AND followee_id = u.user_id) as is_following,
+      (SELECT COUNT(*) FROM follows WHERE followee_id = u.user_id) as follower_count,
+      (SELECT COUNT(*) FROM follows WHERE follower_id = u.user_id) as following_count
+     FROM users u WHERE u.username = ?`,
+    [currentUserId, username]
   );
 
   if (rows.length === 0) {

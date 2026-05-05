@@ -9,6 +9,10 @@ import env from "dotenv";
 
 dotenv.config();
 
+// In-memory store for OTPs to avoid DB changes.
+// Key: email, Value: { otp: string, expiresAt: number }
+const otpStore = new Map<string, { otp: string; expiresAt: number }>();
+
 async function signUp(req: Request, res: Response) {
     try {
         console.log(req.body);
@@ -86,5 +90,78 @@ async function signIn(req: Request, res: Response) {
         res.status(500).json({ message: (err as Error).message });
     }
 }
+async function forgotPassword(req: Request, res: Response) {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
 
-export { signUp, signIn };
+        const [rows] = await db.query<RowDataPacket[]>(
+            `SELECT * FROM users WHERE email = ?`,
+            [email]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "User with this email not found" });
+        }
+
+        // Generate 6 digit random OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Expiration in 5 minutes
+        const expiresAt = Date.now() + 5 * 60 * 1000;
+        
+        otpStore.set(email, { otp, expiresAt });
+
+        res.status(200).json({
+            message: "OTP generated successfully",
+            otp: otp // Sending OTP in response as a mock for email
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: (err as Error).message });
+    }
+}
+
+async function resetPassword(req: Request, res: Response) {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ message: "Email, OTP, and new password are required" });
+        }
+
+        const storedOtpData = otpStore.get(email);
+
+        if (!storedOtpData) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        if (Date.now() > storedOtpData.expiresAt) {
+            otpStore.delete(email);
+            return res.status(400).json({ message: "OTP has expired" });
+        }
+
+        if (storedOtpData.otp !== otp) {
+            return res.status(400).json({ message: "Incorrect OTP" });
+        }
+
+        // Valid OTP, hash new password
+        const hashed_password = await bcrypt.hash(newPassword, 8);
+
+        await db.query(
+            `UPDATE users SET hashed_password = ? WHERE email = ?`,
+            [hashed_password, email]
+        );
+
+        // Clear the OTP from memory
+        otpStore.delete(email);
+
+        res.status(200).json({ message: "Password reset successfully" });
+
+    } catch (err) {
+        res.status(500).json({ message: (err as Error).message });
+    }
+}
+
+export { signUp, signIn, forgotPassword, resetPassword };

@@ -17,3 +17,11 @@ export const signUp = (data: {
 // Returns: { accessToken, message }
 export const signIn = (identifier: string, password: string) =>
   api.post("/auth/signin", { identifier, password });
+
+// POST /api/auth/forgot-password
+export const forgotPassword = (email: string) =>
+  api.post("/auth/forgot-password", { email });
+
+// POST /api/auth/reset-password
+export const resetPassword = (email: string, otp: string, newPassword: string) =>
+  api.post("/auth/reset-password", { email, otp, newPassword });

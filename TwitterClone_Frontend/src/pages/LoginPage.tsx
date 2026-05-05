@@ -93,6 +93,11 @@ const LoginPage: React.FC = () => {
               Sign up
             </Link>
           </p>
+          <p className="mt-2 text-textSecondary text-sm">
+            <Link to="/forgot-password" className="text-primary hover:underline font-semibold">
+              Forgot password?
+            </Link>
+          </p>
         </div>
       </div>
     </div>

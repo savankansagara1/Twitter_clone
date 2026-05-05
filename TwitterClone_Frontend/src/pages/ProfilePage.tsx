@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUserById, getUserTweets, getUserReplies, getUserLikes } from "../api/users.api";
+import { getUserByUsername, getUserTweets, getUserReplies, getUserLikes } from "../api/users.api";
 import type { User, Tweet } from "../types";
 import Sidebar from "../components/layout/Sidebar";
 import ProfileCard from "../components/profile/ProfileCard";
@@ -37,34 +37,29 @@ const ProfilePage: React.FC = () => {
   const loadProfile = async () => {
     setLoading(true);
     try {
-      // First get the user object by username (we need user_id for getUserById)
-      // The backend route is /users/:id (by ID), so we fetch tweets first to get user info
+      // First get the user profile
+      const userRes = await getUserByUsername(username!);
+      const userData = userRes.data.user;
+      
+      setUser({
+        user_id: userData.user_id,
+        fullname: userData.fullname,
+        username: userData.username,
+        email: userData.email || "",
+        dob: userData.dob || "",
+        profile_pic: userData.profile_pic,
+        cover_pic: userData.cover_pic,
+        created_at: userData.created_at,
+        bio: userData.bio || "",
+        country: userData.country || "",
+        is_following: userData.is_following, // Backend returns 0 or 1
+        follower_count: Number(userData.follower_count) || 0,
+        following_count: Number(userData.following_count) || 0,
+      });
+
+      // Then get the tweets
       const tweetsRes = await getUserTweets(username!);
       const fetchedTweets: Tweet[] = tweetsRes.data.tweets || [];
-
-      // Extract user info from first tweet if available, otherwise we need a separate call
-      // The backend /users/:username/tweets returns tweet objects with user info
-      // We also need the full User object — get it from a separate profile call
-      // But /api/users/:id requires an ID, not username. Let's get user info from tweets.
-      if (fetchedTweets.length > 0) {
-        // Build a partial user object from tweet data
-        const firstTweet = fetchedTweets[0];
-        // console.log(firstTweet);
-        
-            const userId = fetchedTweets[0].user_id;
-            // console.log(userId);
-            
-        setUser({
-          user_id: firstTweet.user_id,
-          fullname: firstTweet.fullname,
-          username: firstTweet.username,
-          email: "",
-          dob: "",
-          profile_pic: firstTweet.profile_pic,
-          cover_pic :firstTweet.cover_pic,
-          created_at: firstTweet.created_at,
-        });
-      }
       setTweets(fetchedTweets);
     } catch {
       toast.error("Failed to load profile");

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { User } from "../../types";
 import { useAuth } from "../../hooks/useAuth";
@@ -7,19 +7,26 @@ import Avatar from "../shared/Avatar";
 
 interface ProfileCardProps {
   user: User;
-  followerCount?: number;
-  followingCount?: number;
 }
 
 // Shows the full user profile header (cover, avatar, bio, stats)
 const ProfileCard: React.FC<ProfileCardProps> = ({
   user,
-  followerCount = 0,
-  followingCount = 0,
 }) => {
   const { authUser } = useAuth();
   const isOwnProfile = authUser?.user_id === user.user_id;
-  // console.log(user.cover_pic);
+  
+  const [currentFollowers, setCurrentFollowers] = useState(user.follower_count || 0);
+  const [currentFollowing, setCurrentFollowing] = useState(user.following_count || 0);
+
+  useEffect(() => {
+    setCurrentFollowers(user.follower_count || 0);
+    setCurrentFollowing(user.following_count || 0);
+  }, [user]);
+
+  const handleFollowToggle = (isFollowing: boolean) => {
+    setCurrentFollowers((prev) => (isFollowing ? prev + 1 : Math.max(0, prev - 1)));
+  };
   
   return (
     <div>
@@ -49,7 +56,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
             </Link>
           ) : (
             <div className="mt-14">
-              <FollowButton userId={user.user_id} initialFollowing={false} />
+              <FollowButton 
+                userId={user.user_id} 
+                initialFollowing={user.is_following === 1 || user.is_following === true}
+                onToggle={handleFollowToggle}
+              />
             </div>
           )}
         </div>
@@ -78,11 +89,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         {/* Follower / following counts */}
         <div className="flex gap-5 mt-3 text-sm">
           <span>
-            <strong className="text-textPrimary">{followingCount}</strong>{" "}
+            <strong className="text-textPrimary">{currentFollowing}</strong>{" "}
             <span className="text-textSecondary">Following</span>
           </span>
           <span>
-            <strong className="text-textPrimary">{followerCount}</strong>{" "}
+            <strong className="text-textPrimary">{currentFollowers}</strong>{" "}
             <span className="text-textSecondary">Followers</span>
           </span>
         </div>

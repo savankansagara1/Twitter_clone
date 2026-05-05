@@ -5,6 +5,8 @@ import ProtectedRoute from "./ProtectedRoute";
 // Pages
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 import HomePage from "../pages/HomePage";
 import TweetDetailPage from "../pages/TweetDetailPage";
 import ProfilePage from "../pages/ProfilePage";
@@ -17,6 +19,8 @@ const AppRouter: React.FC = () => {
         {/* Public routes — redirect to home if already logged in */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Protected routes — redirect to login if not authenticated */}
         <Route

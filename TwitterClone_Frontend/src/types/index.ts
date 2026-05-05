@@ -12,6 +12,9 @@ export interface User {
   profile_pic?: string;
   cover_pic?: string;
   created_at: string;
+  is_following?: number | boolean;
+  follower_count?: number;
+  following_count?: number;
 }
 
 // Tweet/retweet object returned by the feed and profile APIs
